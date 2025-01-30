@@ -6,7 +6,7 @@ import { FaFacebookF } from "react-icons/fa";
 
 function Footer() {
   return (
-    <div style={{ height: "300px" }} className="mt-5 p-2 text-white w-full bg-[#7c3aed]">
+    <div style={{ height: "200px" }} className="mt-5 p-2 text-white w-full bg-[#7c3aed] ">
       <div className="flex justify-between">
         {/* intro */}
         <div className="" style={{ width: "400px" }}>
