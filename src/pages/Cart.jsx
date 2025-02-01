@@ -1,11 +1,42 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Header from "../components/Header"
+import { useDispatch, useSelector } from "react-redux"
+import { useEffect, useState } from "react"
+import {  decrementQuality, emptyCart, incrementQuantity, removeCartItem } from "../redux/slices/cartSlice"
 
 const Cart = () => {
+  const[cartTotal,setCartTotal]=useState(0)
+  const userCart=useSelector(state=>state.CartReducer)
+  const dispatch=useDispatch()
+  const navigate=useNavigate()
+  
+  useEffect(()=>{
+  if(userCart?.length>0){
+    setCartTotal(userCart?.map(item=>item.totalPrice).reduce((a,b)=>a+b))
+  }
+  },[userCart])
+
+  const handleDecrementQuality=(product)=>{
+    if(product?.quantity>1){
+      dispatch(decrementQuality(product.id))
+    }else{
+      dispatch(removeCartItem(product.id))
+    }
+  }
+  
+ const Checkout=()=>{
+  dispatch(emptyCart())
+  alert("Order Conformed....Thank you")
+  navigate('/')
+ }
+
   return (
     <>
       <Header />
       <div style={{ paddingTop: '100px' }} className="px-5">
+       {
+  userCart?.length>0?
+    <>
         <h2 className="text-6xl font-bold text-blue-600">Cart summary</h2>
         <div className="grid grid-cols-3 gap-4 mt-5">
           <div className="col-span-2 border rounded p-5 shadow">
@@ -21,37 +52,49 @@ const Cart = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Product name</td>
+               {
+                userCart?.map((product,index)=>(
+                  <tr key={index}>
+                  <td>{index+1}</td>
+                  <td>{product?.title}</td>
                   <td>
-                  <img width={'70px'} height={'70px'} src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSMvbqwTS7VqJip_JtSRSfTjLUNk-Y1Fz6QtnJakxsh2R74TBDmGL89EVN15GjA7YEbCVHyRZAolWCIECxZKCw4EmHOJjBHBGFfHHdbYSQvSRJBCOsevE30BJlnXpcN&usqp=CAc" alt="cat-img" />
+                  <img width={'70px'} height={'70px'} src={product?.images} alt="cat-img" />
                   </td>
                   <td>
                     <div className="flex">
-                      <button className="font-bold">-</button>
-                      <input style={{width:'40px'}} className="border rounded p-1 mx-2" value={1} type="text" />
-                      <button className="font-bold">+</button>
+                      <button onClick={()=>handleDecrementQuality(product)}  className="font-bold">-</button>
+                      <input style={{width:'40px'}} className="border rounded p-1 mx-2" value={product?.quantity} type="text" />
+                      <button onClick={()=>dispatch(incrementQuantity(product.id))} className="font-bold">+</button>
                     </div>
                   </td>
-                   <td>$30</td>
-                   <td><button className="text-red-500" ><i className="fa-solid fa-trash"></i></button></td>
+                   <td>{product?.totalPrice}</td>
+                   <td><button onClick={()=>dispatch(removeCartItem(product.id))} className="text-red-500" ><i className="fa-solid fa-trash"></i></button></td>
                 </tr>
+                ))
+               }
               </tbody>
             </table>
             <div className="float-right mt-5">
-              <button className="bg-red-600 rounded p-2 text-white">Empty Cart</button>
+              <button onClick={()=>dispatch(emptyCart())} className="bg-red-600 rounded p-2 text-white">Empty Cart</button>
               <Link to={'/'} className="bg-blue-500 ms-3 rounded p-2 text-white ">Shop More</Link>
             </div>
           </div>
           <div className="col-span-1">
              <div className="border rounded shadow p-5">
-              <h2 className="text-2xl font-bold">Total Amount: <span className="text-red-600">$340</span></h2>
+              <h2 className="text-2xl font-bold">Total Amount: <span className="text-red-600">{cartTotal}</span></h2>
               <hr/>
-              <button className="bg-green-500 rounded p-2 text-white w-full mt-4">Check out</button>
+              <button onClick={Checkout} className="bg-green-500 rounded p-2 text-white w-full mt-4">Check out</button>
              </div>
           </div>
         </div>
+        </>
+
+:
+   <div className="text-center font-bold text-red-500 ">
+    Your Cart is Empty
+   </div>
+
+       }
       </div>
     </>
   )

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import { useDispatch, useSelector } from 'react-redux'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { fetchProducts } from '../redux/slices/productSlice'
 function Home() {
   const dispatch=useDispatch()
@@ -9,10 +9,27 @@ function Home() {
    const {allProducts,loading,errorMsg}=useSelector(state=>state.productReducer)
 console.log(allProducts,loading,errorMsg);
 
+ const[currentPage,setCurrentPage]=useState(1)
+ const productPages=8
+ const totalPages=Math.ceil(allProducts?.length/productPages)
+ const currentPageProductLastIndex=currentPage*productPages
+ const currentPageProductFirstIndex=currentPageProductLastIndex-productPages
+ const visibleAllProducts=allProducts?.slice(currentPageProductFirstIndex,currentPageProductLastIndex)
 
   useEffect(()=>{
       dispatch(fetchProducts())
   },[])
+
+  const navigateToNextPage=()=>{
+    if(currentPage!=totalPages){
+      setCurrentPage(currentPage+1)
+    }
+  }
+  const navigateToPreviewsPage=()=>{
+    if(currentPage!=1){
+      setCurrentPage(currentPage-1)
+    }
+  }
   return (
     <>
       <Header insideHome={true}/>
@@ -28,7 +45,7 @@ console.log(allProducts,loading,errorMsg);
          <div className='grid grid-cols-4 gap-4'>
          {
           allProducts.length>0?
-          allProducts.map((product,index)=>(
+          visibleAllProducts.map((product,index)=>(
             <div key={index} className='rounded border p-2 shadow-lg'>
           <img src={product.thumbnail} width={'100%'} height={'200px'}  alt="product-image" />
         <div className='text-center'>
@@ -47,6 +64,12 @@ console.log(allProducts,loading,errorMsg);
         </div>
         </>
        }
+      </div>
+      <div className='text-2xl text-center font-bold mt-20'>
+        <span onClick={navigateToPreviewsPage} className='cursor-pointer'><i className='fa-solid fa-backward me-5'></i></span>
+        <span>{currentPage} of {totalPages}</span>
+        <span onClick={navigateToNextPage} className='cursor-pointer'><i className='fa-solid fa-forward ms-5'></i></span>
+       
       </div>
     </>
   )

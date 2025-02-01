@@ -3,12 +3,14 @@ import Header from "../components/Header"
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist } from "../redux/slices/wishlistSlice";
+import { addToCart } from "../redux/slices/cartSlice";
 
 const View = () => {
 
 
   const dispatch=useDispatch()
   const userWishlsit=useSelector(state=>state.wishlistReducer)
+  const userCart=useSelector(state=>state.CartReducer)
 
 
 
@@ -35,6 +37,17 @@ useEffect(()=>{
     alert('Product added to wishlist')
   }
 
+ }
+
+
+ const handleCart=()=>{
+  dispatch(addToCart(product))
+  const existingProduct=userCart?.find(item=>item.id==params.id)
+  if(existingProduct){
+    alert("Product Quantity incremented")
+  }else{
+    alert("Product aded to your cart")
+  }
  }
 
 
@@ -80,7 +93,7 @@ return (
             }
             <div className="flex gap-5 mt-5">
         <button onClick={handleWishlist} className="bg-blue-600 rounded text-white p-2">Add to Wishlist</button>
-        <button className="bg-green-600 rounded text-white p-2">Add to Cart</button>
+        <button onClick={handleCart} className="bg-green-600 rounded text-white p-2">Add to Cart</button>
             </div>
            </div>
         </div>

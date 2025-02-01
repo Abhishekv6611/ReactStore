@@ -1,10 +1,27 @@
-import {  useSelector } from "react-redux"
+import {  useDispatch, useSelector } from "react-redux"
 import Header from "../components/Header"
+import { removeItem } from "../redux/slices/wishlistSlice"
+import { addToCart } from "../redux/slices/cartSlice"
 
 const Wishlist = () => {
+  const userCart=useSelector(state=>state.CartReducer)
+   const dispatch=useDispatch()
   const userWishlsit=useSelector(state=>state.wishlistReducer)
 
-  return (
+
+  const handleCart=(product)=>{
+  dispatch(addToCart(product))
+  const existingProduct=userCart?.find(item=>item.id==product.id)
+  if(existingProduct){
+    alert("Product Quantity incremented")
+  }else{
+    alert("Product aded to your cart")
+  }
+}  
+
+
+
+return (
     <>
     <Header/>
     <div style={{paddingTop:'100px'}} className="px-5">
@@ -20,8 +37,8 @@ const Wishlist = () => {
             <div className='text-center'>
               <h3 className='text-xl font-bold'>{product.title}</h3>
                <div className="flex justify-evenly mt-3">
-                 <button className="text-xl"><li className="fa-solid fa-heart-circle-xmark text-red-600"></li></button>
-                 <button className="text-xl"><li className="fa-solid fa-cart-plus text-green-600"></li></button>
+                 <button className="text-xl" onClick={()=>dispatch(removeItem(product.id))}><li className="fa-solid fa-heart-circle-xmark text-red-600"></li></button>
+                 <button className="text-xl" onClick={()=>handleCart(product)}><li className="fa-solid fa-cart-plus text-green-600"></li></button>
                </div>
             </div>
           </div>

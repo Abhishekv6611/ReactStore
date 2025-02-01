@@ -16,31 +16,41 @@ const ProductSlice= createSlice({
     name:"product",
     initialState:{
         allProducts:[],
+        dummyAllProducts:[],
         loading:false,
         errorMsg:""
     },
     reducers:{
+      searchProduct:(state,action)=>{
+        state.allProducts= state.dummyAllProducts.filter(item=>item.title.toLowerCase().includes(action.payload))
+         }
 
     },
     extraReducers:(builder)=>{
         builder.addCase(fetchProducts.fulfilled,(state,action)=>{
             state.allProducts=action.payload
+            state.dummyAllProducts=action.payload
+
             state.loading=false
             state.errorMsg=""
 
         })
         builder.addCase(fetchProducts.pending,(state)=>{
             state.allProducts=[]
+            state.dummyAllProducts=[]
+
             state.loading=true
             state.errorMsg=""
 
         })
         builder.addCase(fetchProducts.rejected,(state)=>{
             state.allProducts=[]
+            state.dummyAllProducts=[]
             state.loading=false
             state.errorMsg="Api call failed"
 
         })
     }
 })
+export const {searchProduct}=ProductSlice.actions
 export default ProductSlice.reducer;
